@@ -1,0 +1,74 @@
+global_defs{
+  router_id kproxy-srv01
+  script_user ubuntu
+  enable_script_security
+    lvs_sync_daemon interface ens3
+}
+
+vrrp_track_process track_kproxy {
+  process kproxy
+  weight 60
+}
+
+vrrp_script hc_kproxy {
+  script "/usr/local/bin/hc_kproxy.sh"
+  interval 10 # (secs0
+  timeout 5   # wait for (secs)
+  rise 3      # healthy times
+  fall 3      # unhealthy times
+}
+
+
+vrrp_instance kproxyV {
+  virtual_router_id 11
+  advert_int 1
+  priority 151
+  nopreempt
+
+  state BACKUP
+  interface ens3
+
+  authentication {
+    auth_type PASS
+    auth_pass KentiK
+  }
+
+  virtual_ipaddress {
+    10.140.23.211 dev ens3
+  }
+#  track_process {
+#    track_kproxy
+#  }
+  track_script {
+    hc_kproxy
+  }
+}
+
+virtual_server 10.140.23.211 9995 {
+  delay_loop 2
+  lb_algo sh
+  lb_kind NAT
+  #persistence_timeout 0
+  #persistence_granularity 255.255.255.0
+  protocol UDP
+  #ops
+
+  real_server 10.140.23.201 {
+    weight 10
+    TCP_CHECK {
+      connect_timeout 4
+      retry 3
+      delay_before_retry 2
+      connect_port 9996
+    }
+  }
+  real_server 10.140.23.202 {
+    weight 10
+    TCP_CHECK {
+      connect_timeout 4
+      retry 3
+      delay_before_retry 2
+      connect_port 9996
+    }
+  }
+}
