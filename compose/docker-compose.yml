@@ -1,0 +1,20 @@
+version: "3"
+services:
+  kproxy:
+    container_name: kproxy
+    hostname: kproxy
+    image: kentik/kproxy
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - KENTIK_API_TOKEN=${KENTIK_API_TOKEN}
+    command:
+      - -api_email=${KENTIK_API_EMAIL}
+      - -port=${KENTIK_PORT_LISTEN}
+      - -region=${KENTIK_REGION}
+        #- -dns=${KPROXY_DNS}
+        #- -log_level=info 
+        #- -host=0.0.0.0
+        #- -proxy_host=127.0.0.1
+        #- -healthcheck=127.0.0.1
+        #- -snmp_file=${KENTIK_SNMP_FILE}
