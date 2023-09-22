@@ -1,0 +1,24 @@
+version: "3"
+services:
+  kproxy:
+    container_name: kproxy
+    hostname: kproxy
+    image: kentik/kproxy
+    ports:
+      - "9995:9995/udp"
+      - "9996:9996/tcp"
+    restart: unless-stopped
+    environment:
+      - KENTIK_API_TOKEN=${KENTIK_API_TOKEN}
+    command:
+      - -api_email=${KENTIK_API_EMAIL}
+        #- -api_token=${KENTIK_API_TOKEN}
+        #      - -port=${KENTIK_PORT_LISTEN}
+      - -region=${KENTIK_REGION}
+        #- -dns=${KPROXY_DNS}
+        #- -log_level=info 
+        #- -host=0.0.0.0
+        #- -proxy_host=127.0.0.1
+      - -healthcheck=0.0.0.0
+        #- -auto_update=true
+        #- -snmp_file=${KENTIK_SNMP_FILE}
